@@ -10,12 +10,13 @@ import numpy as np
 from utils.visualize import Visualizer
 from torchnet import meter
 
-EPOCH_NUM = 2
-MODEL_PATH = "models/V1.0/U_Net.pkl"
-N_CHANNEL = 3
-N_CLASS = 2
-LR = 2e-5
-BATCH_NUM = 36038
+# 若要修改宏参数，请到 config.py 中进行修改
+# EPOCH_NUM = 2
+# MODEL_PATH = "models/V1.0/U_Net.pkl"
+# N_CHANNEL = 3
+# N_CLASS = 2
+# LR = 2e-5
+# BATCH_NUM = 36038
 
 # 0: Tesla K20C   1: Quadro 600
 print(torch.cuda.is_available())
@@ -59,12 +60,12 @@ def val(model, dataloader):
 
 vis = Visualizer(opt.env)
 
-my_model = U_Net(N_CHANNEL, N_CLASS)
+my_model = U_Net(opt.n_channel, opt.n_class)
 # print(my_model)
 
 # criterion = torch.nn.CrossEntropyLoss().cuda()
 criterion = torch.nn.NLLLoss()
-optimizer = torch.optim.Adam(my_model.parameters(), lr=LR)
+optimizer = torch.optim.Adam(my_model.parameters(), lr=opt.lr)
 
 if torch.cuda.is_available():
     my_model = my_model.cuda()
@@ -76,7 +77,7 @@ confusion_matrix = meter.ConfusionMeter(2)
 previous_loss = 1e100
 
 # train
-for epoch in range(EPOCH_NUM):
+for epoch in range(opt.epoch_num):
 
     loss_meter.reset()
     confusion_matrix.reset()
@@ -99,10 +100,11 @@ for epoch in range(EPOCH_NUM):
         loss.backward()
         optimizer.step()
 
+        # 记录loss下降并将其记录到可视化中
         if i % opt.print_freq == 0:
             vis.plot('loss', loss_meter.value()[0])
-            print("Epoch [%d/%d], Iter [%d/%d] Loss: %.4f" % (epoch + 1, EPOCH_NUM, i + 1, BATCH_NUM, loss.data[0]))
-    torch.save(my_model, MODEL_PATH)
+            print("Epoch [%d/%d], Iter [%d/%d] Loss: %.4f" % (epoch + 1, opt.epoch_num, i + 1, opt.batch_num, loss.data[0]))
+    torch.save(my_model, opt.model_path)
 
     # validate and visualize
     val_cm, val_accuracy = val(my_model, val_loader)
@@ -110,13 +112,13 @@ for epoch in range(EPOCH_NUM):
     vis.plot('val_accuracy', val_accuracy)
     vis.log("epoch:{epoch},lr:{lr},loss:{loss},train_cm:{train_cm},val_cm:{val_cm}".format(
         epoch=epoch, loss=loss_meter.value()[0], val_cm=str(val_cm.value()), train_cm=str(confusion_matrix.value()),
-        lr=LR))
+        lr=opt.lr))
 
     # update learning rate
     if loss_meter.value()[0] > previous_loss:
-        lr = lr * opt.lr_decay
+        opt.lr = opt.lr * opt.lr_decay
         # 第二种降低学习率的方法:不会有moment等信息的丢失
         for param_group in optimizer.param_groups:
-            param_group['lr'] = lr
+            param_group['lr'] = opt.lr
 
     previous_loss = loss_meter.value()[0]

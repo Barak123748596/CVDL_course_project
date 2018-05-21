@@ -1,3 +1,4 @@
+from config import opt
 import numpy as np
 import torch
 import torchvision
@@ -8,7 +9,7 @@ from PIL import Image
 import cv2
 import random
 
-PATH_FOLDER = ""
+# PATH_FOLDER = ""
 
 # def default_img_loader(path):
 #     return Image.open(path).convert("RGB")
@@ -17,14 +18,14 @@ PATH_FOLDER = ""
 #     return Image.open(path).convert("1")
 
 
-def default_img_loader(path):
+def default_img_loader(path):   # 读取图片用
     # img = cv2.imread(path)
     # print(np.shape(img))
     # return Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
     return Image.open(path).convert('RGB')
 
 
-def default_label_loader(path):
+def default_label_loader(path): # 读取标签用
     # img = cv2.imread(path)
     # print(np.shape(img))
     # return Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY))
@@ -34,7 +35,7 @@ def default_label_loader(path):
 
 class MyDataset(Dataset):
     def __init__(self, txt, transform=None, target_transform=None,
-                 img_loader=default_img_loader, label_loader=default_label_loader, add_wrd=PATH_FOLDER):
+                 img_loader=default_img_loader, label_loader=default_label_loader, add_wrd=opt.path_folder):
         fh = open(txt, 'r')
         imgs = []
         for line in fh:
@@ -53,11 +54,13 @@ class MyDataset(Dataset):
         img = self.img_loader(fn)
         label = self.label_loader(label)
         if self.transform is not None:
-            # Same Seed
+            # 用于对img和labels的transform有相同的随机数，目前存疑，不知是否真能达到效果
             seed = np.random.randint(2147483647)
             random.seed(seed)  # apply this seed to img transforms
+            np.random.seed(seed)
             img = self.transform(img)
             random.seed(seed)  # apply this seed to img transforms
+            np.random.seed(seed)
             label = self.transform(label)
         return img, label
 
