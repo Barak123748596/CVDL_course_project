@@ -6,6 +6,7 @@ from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
 import cv2
+import random
 
 PATH_FOLDER = ""
 
@@ -53,7 +54,10 @@ class MyDataset(Dataset):
         label = self.label_loader(label)
         if self.transform is not None:
             # Same Seed
+            seed = np.random.randint(2147483647)
+            random.seed(seed)  # apply this seed to img transforms
             img = self.transform(img)
+            random.seed(seed)  # apply this seed to img transforms
             label = self.transform(label)
         return img, label
 
