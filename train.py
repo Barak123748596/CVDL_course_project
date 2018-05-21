@@ -37,12 +37,13 @@ def val(model, dataloader):
     confusion_matrix = meter.ConfusionMeter(2)
     for ii, data in enumerate(dataloader):
         input, label = data
-        val_input = Variable(input, volatile=True)
-        val_label = Variable(label.long(), volatile=True)
-        if torch.cuda.is_available():
-            val_input.cuda()
-            val_label.cuda()
+        val_input = Variable(input, volatile=True).cuda()
+        val_label = Variable(label.long(), volatile=True).cuda()
+        # if torch.cuda.is_available():
+        #     val_input.cuda()
+        #     val_label.cuda()
         score = model(val_input)
+        print(len(score.data.squeeze()), len(val_label))
         confusion_matrix.add(score.data.squeeze(), val_label)
 
         # 把模型恢复为训练模式
@@ -55,16 +56,16 @@ def val(model, dataloader):
 
 vis = Visualizer(opt.env)
 
-my_model = U_Net(N_CHANNEL, N_CLASS)
+my_model = U_Net(N_CHANNEL, N_CLASS).cuda()
 # print(my_model)
 
 # criterion = torch.nn.CrossEntropyLoss().cuda()
-criterion = torch.nn.NLLLoss()
+criterion = torch.nn.NLLLoss().cuda()
 optimizer = torch.optim.Adam(my_model.parameters(), lr=LR)
 
-if torch.cuda.is_available():
-    my_model.cuda()
-    criterion.cuda()
+# if torch.cuda.is_available():
+#     my_model.cuda()
+#     criterion.cuda()
 
 #统计指标：平滑处理之后的损失，还有混淆矩阵
 loss_meter = meter.AverageValueMeter()
@@ -78,11 +79,11 @@ for epoch in range(EPOCH_NUM):
     confusion_matrix.reset()
 
     for i, (images, labels) in enumerate(train_loader):
-        images = Variable(images)
-        labels = Variable(labels.long())
-        if torch.cuda.is_available():
-            images.cuda()
-            labels.cuda()
+        images = Variable(images).cuda()
+        labels = Variable(labels.long()).cuda()
+        # if torch.cuda.is_available():
+        #     images.cuda()
+        #     labels.cuda()
         labels = labels.squeeze(1)
 
         # Forward + Backward + Optimize
@@ -97,7 +98,7 @@ for epoch in range(EPOCH_NUM):
 
         if i % opt.print_freq == 0:
             vis.plot('loss', loss_meter.value()[0])
-            print("Epoch [%d/%d], Iter [%d/%d] Loss: %.4f" % (epoch + 1, EPOCH_NUM, i + 1, BATCH_NUM, loss.data[0]))
+            print("Epoch [%d/%d], Iter [%d/%d] Loss: %.4f" % (epoch + 1, EPOCH_NUM, i + 1, BATCH_NUM, loss.item()))
     torch.save(my_model, MODEL_PATH)
 
     # validate and visualize

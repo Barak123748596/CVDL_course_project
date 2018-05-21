@@ -74,7 +74,7 @@ train_data = MyDataset(txt="train.txt",
                                                                           saturation=.2),
                                                    transforms.ToTensor()
                                                    ]))
-train_loader = DataLoader(train_data, batch_size=4, shuffle=True)
+train_loader = DataLoader(train_data, batch_size=1, shuffle=True)
 
 val_data = MyDataset(txt="val.txt",
                      transform=transforms.Compose([transforms.RandomRotation(180),
@@ -85,7 +85,7 @@ val_data = MyDataset(txt="val.txt",
                                                                           saturation=.2),
                                                    transforms.ToTensor()
                                                    ]))
-val_loader = DataLoader(val_data, batch_size=4, shuffle=True)
+val_loader = DataLoader(val_data, batch_size=1, shuffle=True)
 '''
 test_data = MyDataset(txt='data/submit_sample.txt',
                    transform=transforms.Compose([transforms.Resize(256),
