@@ -31,4 +31,4 @@ A CVPR PKU course project
 
 - 估计简单用U-Net分割效果不会特别好，之后很可能还要改进。如果有同学了解图像处理相关知识（比如预处理、传统方法进行分割），或者很懂深度网络调参（逸子和狗神经验不足），麻烦**喊一嗓子**，方便之后的讨论。
 
-![Lena镇楼](https://github.com/Barak123748596/CVDL_course_project/lena.jpg)
+![Lena镇楼](https://github.com/Barak123748596/CVDL_course_project/blob/master/lena.jpg)
