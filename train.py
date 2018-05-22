@@ -5,7 +5,7 @@ from torch.autograd import Variable
 from torch import nn
 from torchvision import models
 import os
-from U_Net import U_Net
+from models.U-Net.U_Net import U_Net
 import numpy as np
 from utils.visualize import Visualizer
 from torchnet import meter
