@@ -9,6 +9,7 @@ from U_Net import U_Net
 import numpy as np
 from utils.visualize import Visualizer
 from torchnet import meter
+import random
 
 # 若要修改宏参数，请到 config.py 中进行修改
 # EPOCH_NUM = 2
@@ -90,6 +91,11 @@ for epoch in range(opt.epoch_num):
             labels = labels.cuda()
         labels = labels.squeeze(1)
 
+        # 设置高斯噪声
+        if random.random() < 1:
+            images = torch.add(images, torch.Tensor(np.random.normal(0, 15, np.array(images).size)).view(
+                np.array(images).shape).cuda())
+
         # Forward + Backward + Optimize
         optimizer.zero_grad()
         outputs = my_model(images)
@@ -103,7 +109,7 @@ for epoch in range(opt.epoch_num):
         # 记录loss下降并将其记录到可视化中
         if i % opt.print_freq == 0:
             vis.plot('loss', loss_meter.value()[0])
-            print("Epoch [%d/%d], Iter [%d/%d] Loss: %.4f" % (epoch + 1, opt.epoch_num, i + 1, opt.batch_num, loss.data[0]))
+            print("Epoch [%d/%d], Iter [%d/%d] Loss: %.4f" % (epoch + 1, opt.epoch_num, i + 1, opt.batch_num, loss.item()))
     torch.save(my_model, opt.model_path)
 
     # validate and visualize
