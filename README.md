@@ -1,6 +1,8 @@
 # CVDL_course_project
 A CVPR PKU course project
+
 内容：遥感图像分割
+
 小组成员：大逸子、狗神、白哥、杨海欣
 
 ## 奋斗精神
