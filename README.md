@@ -33,7 +33,6 @@ A CVPR PKU course project
 
 - 目前第一个模型已经训练了一个epoch，效果还很差（欠拟合），大致如图：
 ![效果图](https://github.com/Barak123748596/CVDL_course_project/blob/master/result.jpg)
-- 目前第一个模型已经训练了一个epoch，效果还很差（欠拟合），大致如图：
 
 - 模型loss的可视化做得不是特别好，cuda还存在memory不够而导致程序崩溃的问题，希望同志们**帮助修改**。
 
