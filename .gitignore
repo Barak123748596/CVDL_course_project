@@ -1,9 +1,8 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
-.diea/
-.raw_data/
-.final_data/
-
+.idea/
+raw_data/
+final_data/
 *.py[cod]
 *$py.class
 

@@ -2,8 +2,8 @@ import torch
 import numpy as np
 import cv2
 
-train_input_path = 'raw_data/train/input_try/'
-train_output_path = 'raw_data/train/output_try/'
+train_input_path = 'raw_data/train/input/'
+train_output_path = 'raw_data/train/output/'
 train_input_save = 'final_data/train/input/'
 train_output_save = 'final_data/train/output/'
 
