@@ -47,7 +47,7 @@ class MyDataset(Dataset):
         self.target_transform = target_transform
         self.img_loader = img_loader
         self.label_loader = label_loader
-
+    
     def __getitem__(self, index):
         fn, label = self.imgs[index]
         img = self.img_loader(fn)
@@ -60,21 +60,21 @@ class MyDataset(Dataset):
             random.seed(seed)  # apply this seed to img transforms
             label = self.transform(label)
         return img, label
-
+    
     def __len__(self):
         return len(self.imgs)
 
 
 train_data = MyDataset(txt="train.txt",
-                     transform=transforms.Compose([transforms.RandomRotation(180),
-                                                   transforms.RandomHorizontalFlip(),
-                                                   transforms.RandomVerticalFlip(),
-                                                   transforms.ColorJitter(brightness=.2,
-                                                                          contrast=.2,
-                                                                          saturation=.2),
-                                                   transforms.ToTensor()
-                                                   ]))
-train_loader = DataLoader(train_data, batch_size=1, shuffle=True)
+                       transform=transforms.Compose([transforms.RandomRotation(180),
+                                                     transforms.RandomHorizontalFlip(),
+                                                     transforms.RandomVerticalFlip(),
+                                                     transforms.ColorJitter(brightness=.3,
+                                                                            contrast=.3,
+                                                                            saturation=.3),
+                                                     transforms.ToTensor()
+                                                     ]))
+train_loader = DataLoader(train_data, batch_size=4, shuffle=True)
 
 val_data = MyDataset(txt="val.txt",
                      transform=transforms.Compose([transforms.RandomRotation(180),
@@ -88,7 +88,7 @@ val_data = MyDataset(txt="val.txt",
 val_loader = DataLoader(val_data, batch_size=4, shuffle=True)
 
 test_data = MyDataset(txt='test.txt',
-                   transform=transforms.Compose([transforms.ToTensor()]))
-test_loader = DataLoader(test_data, batch_size=1, shuffle=True)
+                      transform=transforms.Compose([transforms.ToTensor()]))
+test_loader = DataLoader(test_data, batch_size=1, shuffle=False)
 
 print("load complete!")
