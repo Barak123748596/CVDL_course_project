@@ -48,8 +48,8 @@ def val(model, dataloader):
         # print(np.shape(val_label.cpu().detach().numpy()))
         # print(np.shape(score.cpu().detach().numpy()))
 
-label_flat = (val_label.view(-1, 1)).squeeze(1)
-    score_flat = score.view(-1, 2)
+        label_flat = (val_label.view(-1, 1)).squeeze(1)
+        score_flat = score.view(-1, 2)
         
         # print(np.shape(label_flat.cpu().detach().numpy()))
         # print(np.shape(score_flat.cpu().detach().numpy()))
@@ -59,7 +59,7 @@ label_flat = (val_label.view(-1, 1)).squeeze(1)
     # 把模型恢复为训练模式
     model.train()
 
-cm_value = confusion_matrix.value()
+    cm_value = confusion_matrix.value()
     accuracy = 100. * (cm_value[0][0] + cm_value[1][1]) / \
         (cm_value.sum())
     return confusion_matrix, accuracy
