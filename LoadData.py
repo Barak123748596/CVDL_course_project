@@ -87,7 +87,7 @@ val_data = MyDataset(txt="val.txt",
                                                    ]))
 val_loader = DataLoader(val_data, batch_size=4, shuffle=True)
 
-test_data = MyDataset(txt='test.txt',
+test_data = MyDataset(txt='concat.txt',
                       transform=transforms.Compose([transforms.ToTensor()]))
 test_loader = DataLoader(test_data, batch_size=1, shuffle=False)
 
