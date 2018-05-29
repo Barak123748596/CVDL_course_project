@@ -17,11 +17,10 @@ TEST_RESULT_PATH = "final_data/test/output/"
 
 # 0: Tesla K20C   1: Quadro 600
 print(torch.cuda.is_available())
-print(torch.cuda.device_count())
 
-my_model = torch.load(MODEL_PATH, map_location='cpu')
+my_model = torch.load(MODEL_PATH).cuda()
 print("model from load")
-print(my_model)
+# print(my_model)
 
 criterion = torch.nn.NLLLoss()
 
@@ -40,36 +39,34 @@ for i, (images, labels) in enumerate(test_loader):
     big_id = (i % (36*24*24)) // (24*24)
     tmp_row = (i % (24*24)) // 24
     tmp_col = (i % (24*24)) % 24
-
-    images = Variable(images)
-
-    img_show = np.squeeze(images.numpy(), 0)
-    img_show = img_show.transpose((1, 2, 0))
-    # print(np.shape(img_show))
-    cv2.imshow("tmp_win1", img_show)
-    cv2.waitKey(0)
-
-    if torch.cuda.is_available():
-        images = images.cuda()
-
+    print("city:", city_id, "big:", big_id, "row:", tmp_row, "col:", tmp_col)
+    
+    images = Variable(images).cuda()
+    
+    # img_show = np.squeeze(images.numpy(), 0)
+    # img_show = img_show.transpose((1, 2, 0))
+    # cv2.imshow("tmp_win1", img_show)
+    # cv2.waitKey(1)
+    
     # Forward
     outputs = my_model(images)
-    img_out = np.squeeze((outputs.detach()).cpu().numpy(), 0)
+    img_out = np.squeeze(outputs.cpu().detach().numpy(), 0)
     img_out = img_out.transpose((1, 2, 0))
     prob = np.exp(img_out[:, :, 1])
-
-    avg_prob[tmp_row*400:(tmp_row+1)*400, tmp_col*400:(tmp_col+1)*400] += prob
+    avg_prob[tmp_row*200:(tmp_row*200+400), tmp_col*200:(tmp_col*200+400)] += prob
+    
     # Show result for small img
-    prob[prob < 0.5] = 0
-    prob[prob >= 0.5] = 1
-    img_print = 255.0 * prob
-    cv2.imshow("tmp_win2", img_print)
-    cv2.waitKey(0)
-
+    # prob[prob < 0.5] = 0
+    # prob[prob >= 0.5] = 1
+    # img_print = 255.0 * prob
+    # cv2.imshow("tmp_win2", img_print)
+    # cv2.waitKey(1)
+    
     if (i+1) % BATCH_NUM == 0:
         avg_prob = avg_prob / avg_num
         avg_prob[avg_prob < 0.5] = 0
         avg_prob[avg_prob >= 0.5] = 1
         img_submit = 255 * avg_prob
         cv2.imwrite(TEST_RESULT_PATH + TEST_CITY_NAME[city_id] + str(big_id + 1) + ".tif", img_submit)
-        avg_prob = 0
+        print("Saving...")
+        avg_prob = np.zeros_like(avg_prob)
