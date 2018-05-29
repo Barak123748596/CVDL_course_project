@@ -80,9 +80,9 @@ val_data = MyDataset(txt="val.txt",
                      transform=transforms.Compose([transforms.RandomRotation(180),
                                                    transforms.RandomHorizontalFlip(),
                                                    transforms.RandomVerticalFlip(),
-                                                   transforms.ColorJitter(brightness=.2,
-                                                                          contrast=.2,
-                                                                          saturation=.2),
+                                                   transforms.ColorJitter(brightness=.3,
+                                                                          contrast=.3,
+                                                                          saturation=.3),
                                                    transforms.ToTensor()
                                                    ]))
 val_loader = DataLoader(val_data, batch_size=4, shuffle=True)
