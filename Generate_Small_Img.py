@@ -12,11 +12,11 @@ image_cols = 5000
 x_stride = 150
 y_stride = 150
 
-x_seg = 400
-y_seg = 400
+x_seg = 300
+y_seg = 300
 
 x_slice_num = 1 + ((image_cols - x_seg) // x_stride)
-y_slice_num = 1 + ((image_rows - y_seg) // y_stride)  # 31
+y_slice_num = 1 + ((image_rows - y_seg) // y_stride)  # 32
 
 CITY_NUM = 5
 TRAIN_CITY_NAME = ["austin", "chicago", "kitsap", "tyrol-w", "vienna"]
