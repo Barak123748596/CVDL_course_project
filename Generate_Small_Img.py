@@ -30,7 +30,6 @@ TRAIN_CITY_NAME = ["austin", "chicago", "kitsap", "tyrol-w", "vienna"]
 TEST_CITY_NAME = ["bellingham", "bloomington", "innsbruck", "sfo", "tyrol-e"]
 EACH_CLASS_NUM = 36
 
-TOTAL_RATIO = 0
 '''
     for i in range(CITY_NUM):
     for j in range(EACH_CLASS_NUM):
@@ -102,5 +101,6 @@ for i in range(CITY_NUM):
             # tmp_ans = batch_small_ans[n]
             save_path = test_input_save + str(tmp_id) + "_" + str(n) + ".jpg"
             cv2.imwrite(save_path, tmp_img)
+
 # save_path = train_output_save + str(tmp_id) + "_" + str(n) + ".jpg"
 # cv2.imwrite(save_path, tmp_ans)

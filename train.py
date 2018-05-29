@@ -129,8 +129,8 @@ for epoch in range(EPOCH_NUM):
             plt.clf()
         
         torch.save(my_model, MODEL_PATH)
-            lr = lr * opt.lr_decay
-'''
+        LR = LR * opt.lr_decay
+    '''
     # validate and visualize
     val_cm, val_accuracy = val(my_model, val_loader)
     
@@ -141,10 +141,10 @@ for epoch in range(EPOCH_NUM):
     
     # update learning rate
     if loss_meter.value()[0] > previous_loss:
-    lr = lr * opt.lr_decay
+        LR = LR * opt.lr_decay
     # 第二种降低学习率的方法:不会有moment等信息的丢失
     for param_group in optimizer.param_groups:
-    param_group['lr'] = lr
+        param_group['lr'] = LR
     
     previous_loss = loss_meter.value()[0]
     '''

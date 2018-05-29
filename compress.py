@@ -19,7 +19,7 @@ for file in os.listdir(input_dir):
 	input_file = os.path.join(input_dir,file)
 	output_file = os.path.join(output_dir,file)
 	command = "gdal_translate --config GDAL_PAM_ENABLED NO -co COMPRESS=CCITTFAX4 -co NBITS=1 "+input_file+" "+output_file
-	print command
+	print(command)
 	subprocess.call(command,shell=True)
 
-print "Done!"
+print("Done!")

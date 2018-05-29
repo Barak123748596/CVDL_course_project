@@ -57,7 +57,7 @@ for i, (images, labels) in enumerate(test_loader):
     img_out = img_out.transpose((1, 2, 0))
     prob = np.exp(img_out[:, :, 1])
 
-avg_prob[tmp_row*stride:tmp_row*stride+seg, tmp_col*stride:tmp_col*stride+seg] += prob
+    avg_prob[tmp_row*stride:tmp_row*stride+seg, tmp_col*stride:tmp_col*stride+seg] += prob
     
     # Show result for small img
     # prob[prob < 0.5] = 0
