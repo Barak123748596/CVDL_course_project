@@ -120,7 +120,7 @@ for epoch in range(EPOCH_NUM):
         
         if i % opt.print_freq == 0:
             # vis.plot('loss', loss_meter.value()[0])
-            print("Epoch [%d/%d], Iter [%d/%d] Loss: %.4f" % (epoch + 1, EPOCH_NUM, i + 1, BATCH_NUM, loss.data[0]))
+            print("Epoch [%d/%d], Iter [%d/%d] Loss: %.4f" % (epoch + 1, EPOCH_NUM, i + 1, BATCH_NUM, loss.item()))
             
             plt.plot(train_Loss_record, color="red")
             if i == 36037:
