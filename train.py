@@ -5,14 +5,14 @@ from torch.autograd import Variable
 from torch import nn
 from torchvision import models
 import os
-from U_Net import U_Net
+from U_Net import U_Net, U_Net_pile
 import numpy as np
 from utils.visualize import Visualizer
 from torchnet import meter
 from matplotlib import pyplot as plt
 
 EPOCH_NUM = 5
-MODEL_PATH = "models/V1.1/U_Net.pkl"
+MODEL_PATH = "models/V1.3/U_Net_pile.pkl"
 N_CHANNEL = 3
 N_CLASS = 2
 LR = 2e-5
@@ -70,7 +70,7 @@ if os.path.exists(r'models/V1.1/U_Net.pkl'):
     my_model = torch.load('models/V1.1/U_Net.pkl').cuda()
     print("model from load.")
 else:
-    my_model = U_Net(N_CHANNEL, N_CLASS)
+    my_model = U_Net_pile(N_CHANNEL, N_CLASS, pile=2)
     print("A new model.")
 # print(my_model)
 

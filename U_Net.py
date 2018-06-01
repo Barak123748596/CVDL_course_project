@@ -35,3 +35,14 @@ class U_Net(nn.Module):
         x = self.up4(x, x1)
         x = self.outc(x)
         return x
+
+class U_Net_pile(nn.Module):
+    def __init__(self, n_channels, n_classes, pile=1):
+        super(U_Net_pile, self).__init__()
+        self.U_Net = U_Net(n_channels, n_classes)
+        self.pile = pile
+
+    def forward(self, x):
+        for i in range(self.pile):
+            x = self.U_Net(x)
+        return x
