@@ -48,7 +48,9 @@ class U_Net_pile(nn.Module):
         self.up2 = up(512, 128)
         self.up3 = up(256, 64)
         self.up4 = up(128, 64)
-        self.outc = outconv(64, n_classes)
+        self.conv = nn.Conv2d(64, n_channels, 1)
+        # self.logsoft = nn.LogSoftmax(dim=1)
+        self.outc = outconv(n_channels, n_classes)
         self.pile = pile
 
     def forward(self, x):
@@ -62,5 +64,6 @@ class U_Net_pile(nn.Module):
             x = self.up2(x, x3)
             x = self.up3(x, x2)
             x = self.up4(x, x1)
+            x = self.conv(x)
         x = self.outc(x)
         return x

@@ -66,20 +66,20 @@ def val(model, dataloader):
 
 
 # vis = Visualizer(opt.env)
-if os.path.exists(r'models/V1.1/U_Net.pkl'):
-    my_model = torch.load('models/V1.1/U_Net.pkl').cuda()
+if os.path.exists(MODEL_PATH):
+    my_model = torch.load(MODEL_PATH)
     print("model from load.")
 else:
     my_model = U_Net_pile(N_CHANNEL, N_CLASS, pile=2)
     print("A new model.")
-# print(my_model)
+print(my_model)
 
 criterion = torch.nn.NLLLoss(weight=torch.FloatTensor([0.2, 0.8]))
 optimizer = torch.optim.Adam(my_model.parameters(), lr=LR)
 
 if torch.cuda.is_available():
-    my_model = my_model.cuda()
-    criterion.cuda()
+    my_model = my_model.cuda(device=0)
+    criterion.cuda(device=0)
 
 # 统计指标：平滑处理之后的损失，还有混淆矩阵
 # loss_meter = meter.AverageValueMeter()
@@ -102,8 +102,8 @@ for epoch in range(EPOCH_NUM):
         images = Variable(images)
         labels = Variable(labels.long())
         if torch.cuda.is_available():
-            images = images.cuda()
-            labels = labels.cuda()
+            images = images.cuda(device=0)
+            labels = labels.cuda(device=0)
         labels = labels.squeeze(1)
         
         # Forward + Backward + Optimize
@@ -123,13 +123,12 @@ for epoch in range(EPOCH_NUM):
             print("Epoch [%d/%d], Iter [%d/%d] Loss: %.4f" % (epoch + 1, EPOCH_NUM, i + 1, BATCH_NUM, loss.item()))
             
             plt.plot(train_Loss_record, color="red")
-            if i == 36037:
-                plt.savefig("Results.png")
-            plt.pause(0.001)
-            plt.clf()
+            plt.savefig("Results.png")
+            # plt.pause(0.001)
+            # plt.clf()
         
-        torch.save(my_model, MODEL_PATH)
-        LR = LR * opt.lr_decay
+            torch.save(my_model, MODEL_PATH)
+        # LR = LR * opt.lr_decay
     '''
     # validate and visualize
     val_cm, val_accuracy = val(my_model, val_loader)
