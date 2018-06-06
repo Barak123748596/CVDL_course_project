@@ -10,25 +10,11 @@ import random
 
 PATH_FOLDER = ""
 
-# def default_img_loader(path):
-#     return Image.open(path).convert("RGB")
-#
-# def default_label_loader(path):
-#     return Image.open(path).convert("1")
-
-
 def default_img_loader(path):
-    # img = cv2.imread(path)
-    # print(np.shape(img))
-    # return Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
     return Image.open(path).convert('RGB')
 
 
 def default_label_loader(path):
-    # img = cv2.imread(path)
-    # print(np.shape(img))
-    # return Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY))
-    # return Image.fromarray(cv2.imread(path, 0).reshape(400, 400, 1))
     return Image.open(path).convert('L')
 
 
@@ -56,8 +42,10 @@ class MyDataset(Dataset):
             # Same Seed
             seed = np.random.randint(2147483647)
             random.seed(seed)  # apply this seed to img transforms
+            np.random.seed(seed)
             img = self.transform(img)
             random.seed(seed)  # apply this seed to img transforms
+            np.random.seed(seed)
             label = self.transform(label)
         return img, label
     
@@ -69,26 +57,24 @@ train_data = MyDataset(txt="train.txt",
                        transform=transforms.Compose([transforms.RandomRotation(180),
                                                      transforms.RandomHorizontalFlip(),
                                                      transforms.RandomVerticalFlip(),
-                                                     transforms.ColorJitter(brightness=.3,
-                                                                            contrast=.3,
-                                                                            saturation=.3),
+                                                     transforms.ColorJitter(brightness=0,
+                                                                            contrast=.5,
+                                                                            saturation=1,
+                                                                            hue=.1),
                                                      transforms.ToTensor()
                                                      ]))
 train_loader = DataLoader(train_data, batch_size=1, shuffle=True)
 
 val_data = MyDataset(txt="val.txt",
-                     transform=transforms.Compose([transforms.RandomRotation(180),
-                                                   transforms.RandomHorizontalFlip(),
-                                                   transforms.RandomVerticalFlip(),
-                                                   transforms.ColorJitter(brightness=.3,
-                                                                          contrast=.3,
-                                                                          saturation=.3),
-                                                   transforms.ToTensor()
-                                                   ]))
+                     transform=transforms.Compose([transforms.ToTensor()]))
 val_loader = DataLoader(val_data, batch_size=1, shuffle=True)
 
-test_data = MyDataset(txt='concat.txt',
+test_data = MyDataset(txt='test.txt',
                       transform=transforms.Compose([transforms.ToTensor()]))
 test_loader = DataLoader(test_data, batch_size=1, shuffle=False)
+
+concat_data = MyDataset(txt='concat.txt',
+                      transform=transforms.Compose([transforms.ToTensor()]))
+concat_loader = DataLoader(concat_data, batch_size=1, shuffle=False)
 
 print("load complete!")

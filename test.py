@@ -18,7 +18,7 @@ BATCH_NUM = 961
 print(torch.cuda.is_available())
 print(torch.cuda.device_count())
 
-my_model = torch.load('models/V1.0/U_Net.pkl')
+my_model = torch.load(MODEL_PATH)
 print("model from load")
 print(my_model)
 
@@ -26,7 +26,7 @@ criterion = torch.nn.NLLLoss()
 
 # test
 for epoch in range(EPOCH_NUM):
-    for i, (images, labels) in enumerate(train_loader):
+    for i, (images, labels) in enumerate(test_loader):
         images = Variable(images)
 
         img_show = np.squeeze(images.numpy(), 0)

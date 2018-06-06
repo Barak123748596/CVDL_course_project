@@ -24,7 +24,7 @@ class DefaultConfig(object):
 
     epoch_num = 10
     lr = 2e-5  # initial learning rate
-    lr_decay = 0.95  # when val_loss increase, lr = lr*lr_decay
+    lr_decay = 0.5  # when val_loss increase, lr = lr*lr_decay
     weight_decay = 1e-4  # 损失函数
 
 def parse(self, kwargs):
