@@ -1,4 +1,4 @@
-from config import opt
+from utils.config import opt
 import torch
 from LoadData import train_loader, test_loader
 from torch.autograd import Variable
