@@ -10,6 +10,7 @@ import numpy as np
 from utils.visualize import Visualizer
 from torchnet import meter
 from matplotlib import pyplot as plt
+import random
 
 EPOCH_NUM = 5
 MODEL_PATH = "models/V1.3/U_Net_pile.pkl"
@@ -118,6 +119,11 @@ for epoch in range(EPOCH_NUM):
         loss.backward()
         optimizer.step()
         
+        # 设置高斯噪声
+        if random.random() < 1:
+            images = torch.add(images, torch.Tensor(np.random.normal(0, 15, np.array(images).size)).view(np.array(images).shape).cuda())
+        outputs = my_model(images)
+
         if i % opt.print_freq == 0:
             # vis.plot('loss', loss_meter.value()[0])
             print("Epoch [%d/%d], Iter [%d/%d] Loss: %.4f" % (epoch + 1, EPOCH_NUM, i + 1, BATCH_NUM, loss.item()))
