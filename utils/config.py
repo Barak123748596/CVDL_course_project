@@ -13,7 +13,7 @@ class DefaultConfig(object):
     n_channel = 3  # 输入图片维数
     n_class = 2  # 图片分类
 
-    batch_size = 128  # batch size
+    batch_size = 1  # batch size
     batch_num = 36038
     use_gpu = True  # use GPU or not
     num_workers = 4  # how many workers for loading data

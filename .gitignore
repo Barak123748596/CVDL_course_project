@@ -106,4 +106,7 @@ venv.bak/
 # mypy
 .mypy_cache/
 LoadData.py
+
 Results.png
+models/V1.3/U_Net_pile.pkl
+models/.DS_Store
