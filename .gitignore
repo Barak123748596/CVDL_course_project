@@ -112,3 +112,5 @@ models/V1.3/U_Net_pile.pkl
 models/.DS_Store
 models/
 GitHub Desktop.lnk
+*.pkl
+models/.DS_Store
