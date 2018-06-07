@@ -8,16 +8,16 @@ import os
 from U_Net import U_Net, U_Net_pile
 import numpy as np
 from utils.visualize import Visualizer
-from torchnet import meter
+# from torchnet import meter
 from matplotlib import pyplot as plt
 import random
 import cv2
 
 EPOCH_NUM = 5
-MODEL_PATH = "models/V1.3/U_Net_pile.pkl"
+MODEL_PATH = "models/V1.3/U_Net.pkl"
 N_CHANNEL = 3
 N_CLASS = 2
-LR = 2e-5
+LR = 1e-6
 BATCH_NUM = 150*961 / train_loader.batch_size
 
 def adjust_learning_rate(optimizer, decay_rate=0.5):
@@ -155,7 +155,7 @@ for epoch in range(EPOCH_NUM):
 
         # 设置高斯噪声
         if random.random() < 1:
-            images = torch.add(images, torch.Tensor(np.random.normal(0, 15, np.array(images).size)).view(np.array(images).shape).cuda())
+            images = torch.add(images, torch.Tensor(np.random.normal(0, 0.04, np.array(images).size)).view(np.array(images).shape).cuda())
 
         outputs = my_model(images)
         loss = criterion(outputs, labels)
@@ -168,7 +168,7 @@ for epoch in range(EPOCH_NUM):
         Intersect = (indices * labels == 1).sum()
         Union = indices.sum() + labels.sum() - Intersect
         IoU = 0
-        if Union >0:
+        if Union > 0:
             IoU = float(Intersect) / float(Union + .01)
 
         val_loss = val(my_model, val_loader)
@@ -180,18 +180,18 @@ for epoch in range(EPOCH_NUM):
             tmp_loss = 0
             tmp_val_loss = 0
 
+            plt.plot(train_Loss_record, color="red")
+            plt.plot(val_Loss_record, color="blue")
+            plt.clf()
+
         if i % opt.print_freq == 0:
             # vis.plot('loss', loss_meter.value()[0])
             print("Epoch [%d/%d], Iter [%d/%d] Loss: %.4f, Acc: %.2f, IoU: %.2f"
                   % (epoch + 1, EPOCH_NUM, i + 1, BATCH_NUM, loss.item(),
                      100.0 * correct / (320*320*train_loader.batch_size), 100.0 * IoU))
             print("     val loss: %.4f" % val_loss)
-            
-            plt.plot(train_Loss_record, color="red")
-            plt.plot(val_Loss_record, color="blue")
             plt.savefig("Results.png")
-            # plt.clf()
-        
+
     torch.save(my_model, MODEL_PATH)
     adjust_learning_rate(optimizer=optimizer, decay_rate=opt.lr_decay)
     '''

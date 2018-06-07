@@ -63,7 +63,7 @@ train_data = MyDataset(txt="train.txt",
                                                                             hue=.1),
                                                      transforms.ToTensor()
                                                      ]))
-train_loader = DataLoader(train_data, batch_size=1, shuffle=True)
+train_loader = DataLoader(train_data, batch_size=6, shuffle=True)
 
 val_data = MyDataset(txt="val.txt",
                      transform=transforms.Compose([transforms.ToTensor()]))
