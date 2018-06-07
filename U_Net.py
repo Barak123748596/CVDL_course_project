@@ -15,7 +15,7 @@ class U_Net(nn.Module):
         self.down1 = down(64, 128)
         self.down2 = down(128, 256)
         self.down3 = down(256, 512)
-        self.down4 = down(512, 1025)
+        self.down4 = down(512, 1024)
         self.up1 = up(1024, 512)
         self.up2 = up(512, 256)
         self.up3 = up(256, 128)

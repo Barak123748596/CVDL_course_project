@@ -14,10 +14,10 @@ import random
 import cv2
 
 EPOCH_NUM = 5
-MODEL_PATH = "models/V1.3/U_Net.pkl"
+MODEL_PATH = "models/V1.4/U_Net.pkl"
 N_CHANNEL = 3
 N_CLASS = 2
-LR = 1e-6
+LR = 2e-5
 BATCH_NUM = 150*961 / train_loader.batch_size
 
 def adjust_learning_rate(optimizer, decay_rate=0.5):
@@ -104,12 +104,12 @@ if os.path.exists(MODEL_PATH):
     my_model = torch.load(MODEL_PATH)
     print("model from load.")
 else:
-    # my_model = U_Net(N_CHANNEL, N_CLASS)
-    my_model = U_Net_pile(N_CHANNEL, N_CLASS, pile=2)
+    my_model = U_Net(N_CHANNEL, N_CLASS)
+    # my_model = U_Net_pile(N_CHANNEL, N_CLASS, pile=2)
     print("A new model.")
 # print(my_model)
 
-criterion = torch.nn.NLLLoss(weight=torch.FloatTensor([0.45, 1.55]))
+criterion = torch.nn.NLLLoss(weight=torch.FloatTensor([0.15, 0.85]))
 optimizer = torch.optim.Adam(my_model.parameters(), lr=LR)
 
 if torch.cuda.is_available():
@@ -180,17 +180,17 @@ for epoch in range(EPOCH_NUM):
             tmp_loss = 0
             tmp_val_loss = 0
 
-            plt.plot(train_Loss_record, color="red")
-            plt.plot(val_Loss_record, color="blue")
-            plt.clf()
-
         if i % opt.print_freq == 0:
             # vis.plot('loss', loss_meter.value()[0])
             print("Epoch [%d/%d], Iter [%d/%d] Loss: %.4f, Acc: %.2f, IoU: %.2f"
                   % (epoch + 1, EPOCH_NUM, i + 1, BATCH_NUM, loss.item(),
                      100.0 * correct / (320*320*train_loader.batch_size), 100.0 * IoU))
             print("     val loss: %.4f" % val_loss)
+            plt.plot(train_Loss_record, color="red")
+            plt.plot(val_Loss_record, color="blue")
             plt.savefig("Results.png")
+            plt.pause(0.001)
+            plt.clf()
 
     torch.save(my_model, MODEL_PATH)
     adjust_learning_rate(optimizer=optimizer, decay_rate=opt.lr_decay)
