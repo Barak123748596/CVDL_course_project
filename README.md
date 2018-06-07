@@ -31,10 +31,10 @@ A CVPR PKU course project
 - 已经联系上李老师那边的学姐，可以使用他们实验室的GPU资源。我下周把数据拷过去，然后多训几个epoch，看效果能不能变好…（已做）
 - 模型loss的可视化做得不是特别好，cuda还存在因为memory不够而导致程序崩溃的问题，希望同志们**帮助修改**。（已做）
 - 尝试多个U-Net堆叠，观察训练结果的变化。（先用两个做实验）（未做）
-- 目前已经训练了几个模型，效果还有待提高（一层模型欠拟合，两层堆叠会产生过拟合），大致如图：![过拟合](https://github.com/Barak123748596/CVDL_course_project/blob/master/result.jpg)
+- 目前已经训练了几个模型，效果还有待提高（一层模型欠拟合，两层堆叠会产生过拟合）
 - 设计算法可以由网络预测结果得到的概率图得到方框的算法，可以在未来grabcut中使用（但是穆老师认为grabcut所需要时间过多，可能效果不好）
-- 通过CRF算法对网络模型预测结果进行修正，可以将部分误判结果修正掉，效果还挺好看的，大致如图：![效果图](https://github.com/Barak123748596/CVDL_course_project/blob/master/result.jpg)
-- 目前找到了北京市等地的农田规划图，同时可以通过**水经注万能地图下载器**下载谷歌地图得到0.3米/像素的地图图片。![北京农田规划](https://github.com/Barak123748596/CVDL_course_project/blob/master/result.jpg)
+- 通过CRF算法对网络模型预测结果进行修正，可以将部分误判结果修正掉，效果还挺好看的，大致如图：![CRF](https://github.com/Barak123748596/CVDL_course_project/blob/master/pics/CRF.jpg)
+- 目前找到了北京市等地的农田规划图，同时可以通过**水经注万能地图下载器**下载谷歌地图得到0.3米/像素的地图图片。![北京农田规划](https://github.com/Barak123748596/CVDL_course_project/blob/master/城市规划图/北京市.jpg)
 
 ## 现存问题
 
