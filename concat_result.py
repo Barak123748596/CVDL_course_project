@@ -8,7 +8,7 @@ import numpy as np
 import cv2
 
 EPOCH_NUM = 1
-MODEL_PATH = "models/V1.1/U_Net.pkl"
+MODEL_PATH = "models/V1.4/U_Net.pkl"
 N_CHANNEL = 3
 N_CLASS = 2
 stride = 160
@@ -42,6 +42,8 @@ for i, (images, labels) in enumerate(test_loader):
     big_id = (i % (36*BATCH_NUM)) // BATCH_NUM
     tmp_row = (i % BATCH_NUM) // L_NUM
     tmp_col = (i % BATCH_NUM) % L_NUM
+
+    print("city:", city_id, "big", big_id, tmp_row, tmp_col)
     
     # img_show = np.squeeze(images.numpy(), 0)
     # img_show = img_show.transpose((1, 2, 0))
@@ -65,8 +67,8 @@ for i, (images, labels) in enumerate(test_loader):
     
     # Show result for small img
     # prob[prob < 0.5] = 0
-    # prob[prob >= 0.5] = 1
-    # img_print = 255.0 * prob
+    # prob[prob >= 0.5] = 1.0
+    # img_print = prob
     # cv2.imshow("tmp_win2", img_print)
     # cv2.waitKey(0)
     
@@ -76,8 +78,8 @@ for i, (images, labels) in enumerate(test_loader):
         avg_prob[avg_prob >= 0.5] = 1
         # img_submit = 255 * avg_prob
         avg_prob = avg_prob[60:5060, 60:5060]
-        img_submit = np.array(img_show[60:5060, 60:5060, :])
+        img_submit = np.array(avg_img[60:5060, 60:5060, :]) * 255.0
         img_submit[avg_prob == 1, 0:2] = 40
         cv2.imwrite(TEST_RESULT_PATH + TEST_CITY_NAME[city_id] + str(big_id + 1) + ".jpg", img_submit)
         print("Saving...")
-        avg_prob = np.zeros_like(avg_prob)
+        avg_prob = np.zeros([5120, 5120])
