@@ -46,11 +46,15 @@ class MyDataset(Dataset):
             img = self.transform(img)
             random.seed(seed)  # apply this seed to img transforms
             np.random.seed(seed)
+<<<<<<< HEAD
 
             label = (self.target_transform(label)).round()
             # print("Load:", label.sum())
+=======
+            label = self.target_transform(label)
+>>>>>>> ebfcaa04198d641a8c2ac8cece96f7a52284b7e4
         return img, label
-    
+
     def __len__(self):
         return len(self.imgs)
 
@@ -65,18 +69,30 @@ train_data = MyDataset(txt="train.txt",
                                                                             hue=.1),
                                                      transforms.ToTensor()
                                                      ]),
+<<<<<<< HEAD
                        target_transform=transforms.Compose([# transforms.RandomRotation(20),
                                                             transforms.RandomHorizontalFlip(),
                                                             transforms.RandomVerticalFlip(),
                                                             transforms.ToTensor()
                                                             ]))
 
+=======
+                       target_transform=transforms.Compose([transforms.RandomRotation(180),
+                                                     transforms.RandomHorizontalFlip(),
+                                                     transforms.RandomVerticalFlip(),
+                                                     transforms.ToTensor()
+                                                     ]))
+>>>>>>> ebfcaa04198d641a8c2ac8cece96f7a52284b7e4
 train_loader = DataLoader(train_data, batch_size=6, shuffle=True)
 
 val_data = MyDataset(txt="val.txt",
                      transform=transforms.Compose([transforms.ToTensor()]),
                      target_transform=transforms.Compose([transforms.ToTensor()]))
+<<<<<<< HEAD
 val_loader = DataLoader(val_data, batch_size=6, shuffle=True)
+=======
+val_loader = DataLoader(val_data, batch_size=1, shuffle=True)
+>>>>>>> ebfcaa04198d641a8c2ac8cece96f7a52284b7e4
 
 test_data = MyDataset(txt='test.txt',
                       transform=transforms.Compose([transforms.ToTensor()]),
@@ -85,7 +101,11 @@ test_loader = DataLoader(test_data, batch_size=1, shuffle=False)
 
 concat_data = MyDataset(txt='concat.txt',
                       transform=transforms.Compose([transforms.ToTensor()]),
+<<<<<<< HEAD
                       target_transform=transforms.Compose([transforms.ToTensor()]))
+=======
+                        target_transform=transforms.Compose([transforms.ToTensor()]))
+>>>>>>> ebfcaa04198d641a8c2ac8cece96f7a52284b7e4
 concat_loader = DataLoader(concat_data, batch_size=1, shuffle=False)
 
 print("load complete!")
