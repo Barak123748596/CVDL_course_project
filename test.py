@@ -46,14 +46,8 @@ for epoch in range(EPOCH_NUM):
         cv2.imshow("tmp_win2", -img_out[:, :, 1])
         cv2.waitKey(0)
 
-        # prob = -img_out[:, :, 1]
         prob = np.exp(img_out[:, :, 1])
         prob[prob < 0.6] = 0
         prob[prob >= 0.6] = 1.0
-        img_print = 1.0 * prob
-        # print(img_print)
-        cv2.imshow("tmp_win3", img_print)
+        cv2.imshow("tmp_win3", prob)
         cv2.waitKey(0)
-
-        # if i % opt.print_freq == 0:
-        #     print("Epoch [%d/%d], Iter [%d/%d]..." % (epoch + 1, EPOCH_NUM, i + 1, BATCH_NUM))
