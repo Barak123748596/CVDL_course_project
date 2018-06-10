@@ -19,7 +19,7 @@ x_seg = 320
 y_seg = 320
 
 x_slice_num = 1 + ((image_cols - x_seg) // x_stride)
-y_slice_num = 1 + ((image_rows - y_seg) // y_stride)  # 32
+y_slice_num = 1 + ((image_rows - y_seg) // y_stride)  # 31
 
 # print(x_slice_num, y_slice_num)
 
