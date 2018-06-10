@@ -8,7 +8,6 @@ import os
 from U_Net import U_Net, U_Net_pile
 import numpy as np
 from utils.visualize import Visualizer
-# from torchnet import meter
 from matplotlib import pyplot as plt
 import random
 import cv2
@@ -69,12 +68,6 @@ def adjust_learning_rate(optimizer, decay_rate=0.5):
 
 
 def val(model, dataloader):
-    '''
-        计算模型在验证集上的准确率等信息
-        :param model:
-        :param dataloader:
-        :return:
-        '''
     model.eval()
     if torch.cuda.is_available():
         model = model.cuda()
@@ -169,22 +162,21 @@ for epoch in range(EPOCH_NUM):
         img_show = np.transpose(img_show, (0, 2, 3, 1))
         cv2.imshow("tmpwin1", img_show[0])
         cv2.waitKey(500)
-        #
-        # # For show label
+
+        # For show label
         # lab_show = labels.cpu().numpy()
         # lab_show = np.transpose(lab_show, (1, 2, 0))
         # cv2.imshow("tmpwin2", lab_show * 255.0)
         # cv2.waitKey(0)
-        #
+
         # For show predict
-        predict_show = -(outputs.cpu().detach().numpy())[0, 1:, :, :]
-        predict_show = np.transpose(predict_show, (1, 2, 0))
-        cv2.imshow("tmpwin2", predict_show)
-        cv2.waitKey(500)
+        # predict_show = -(outputs.cpu().detach().numpy())[0, 1:, :, :]
+        # predict_show = np.transpose(predict_show, (1, 2, 0))
+        # cv2.imshow("tmpwin2", predict_show)
+        # cv2.waitKey(500)
 
         prob = torch.exp(outputs)[:, 1, :, :]
 
-        # print(torch.log(DICE).cpu().detach().numpy())
         loss = criterion(outputs, labels)
         if prob.sum() + labels.float().sum() > 0.01:
             DICE = 2 * (prob * labels.float()).sum() / (prob.sum() + labels.float().sum())
@@ -227,21 +219,20 @@ for epoch in range(EPOCH_NUM):
         if i % 500 == 0:
             torch.save(my_model, MODEL_PATH)
     adjust_learning_rate(optimizer=optimizer, decay_rate=opt.lr_decay)
-    '''
-    # validate and visualize
-    val_cm, val_accuracy = val(my_model, val_loader)
-    
-    vis.plot('val_accuracy', val_accuracy)
-    vis.log("epoch:{epoch},lr:{lr},loss:{loss},train_cm:{train_cm},val_cm:{val_cm}".format(
-    epoch=epoch, loss=loss_meter.value()[0], val_cm=str(val_cm.value()), train_cm=str(confusion_matrix.value()),
-    lr=LR))
-    
-    # update learning rate
-    if loss_meter.value()[0] > previous_loss:
-        LR = LR * opt.lr_decay
-    # 第二种降低学习率的方法:不会有moment等信息的丢失
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = LR
-    
-    previous_loss = loss_meter.value()[0]
-    '''
+
+    # # validate and visualize
+    # val_cm, val_accuracy = val(my_model, val_loader)
+    #
+    # vis.plot('val_accuracy', val_accuracy)
+    # vis.log("epoch:{epoch},lr:{lr},loss:{loss},train_cm:{train_cm},val_cm:{val_cm}".format(
+    # epoch=epoch, loss=loss_meter.value()[0], val_cm=str(val_cm.value()), train_cm=str(confusion_matrix.value()),
+    # lr=LR))
+    #
+    # # update learning rate
+    # if loss_meter.value()[0] > previous_loss:
+    #     LR = LR * opt.lr_decay
+    # # 第二种降低学习率的方法:不会有moment等信息的丢失
+    # for param_group in optimizer.param_groups:
+    #     param_group['lr'] = LR
+    #
+    # previous_loss = loss_meter.value()[0]
