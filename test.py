@@ -1,6 +1,6 @@
 # from config import opt
 import torch
-from LoadData import train_loader, test_loader
+from LoadData import train_loader, test_loader, beijing_loader
 from torch.autograd import Variable
 from torch import nn
 from torchvision import models
@@ -26,13 +26,14 @@ criterion = torch.nn.NLLLoss()
 
 # test
 for epoch in range(EPOCH_NUM):
-    for i, (images, labels) in enumerate(train_loader):
+    for i, (images, labels) in enumerate(test_loader):
         images = Variable(images)
 
         img_show = np.squeeze(images.numpy(), 0)
         img_show = img_show.transpose((1, 2, 0))
         # print(np.shape(img_show))
         cv2.imshow("tmp_win1", img_show)
+        cv2.imwrite(str(epoch)+"_"+str(i)+"_0.jpg", img_show*255)
         cv2.waitKey(0)
 
         if torch.cuda.is_available():
@@ -47,6 +48,7 @@ for epoch in range(EPOCH_NUM):
         cv2.waitKey(0)
 
         prob = np.exp(img_out[:, :, 1])
+        cv2.imwrite(str(epoch)+"_"+str(i)+"_1.jpg", prob*255)
         prob[prob < 0.6] = 0
         prob[prob >= 0.6] = 1.0
         cv2.imshow("tmp_win3", prob)

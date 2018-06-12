@@ -14,7 +14,7 @@ from pydensecrf.utils import compute_unary, create_pairwise_bilateral, \
 
 import skimage.io as io
 
-for i in range(10):  # Number of image is 25
+for i in range(21):  # Number of image is 25
     '''
     img_init = cv2.imread("CRF_image_" + str(i) + ".jpg", cv2.IMREAD_COLOR)
     img_yuv = cv2.cvtColor(img_init, cv2.COLOR_BGR2YUV)
@@ -23,13 +23,13 @@ for i in range(10):  # Number of image is 25
     # convert the YUV image back to RGB format
     image = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2BGR)
     '''
-    image = cv2.imread("CRF_image_" + str(i) + ".jpg", cv2.IMREAD_COLOR)
+    image = cv2.imread(str(0)+"_"+str(i) + "_0.jpg", cv2.IMREAD_COLOR)
     # image = image[0:200, 0:200, :]
 
     row = np.shape(image)[0]
     col = np.shape(image)[1]
 
-    softmax = cv2.imread("CRF_prob_" + str(i) + ".jpg", cv2.IMREAD_GRAYSCALE)
+    softmax = cv2.imread(str(0)+"_"+str(i) + "_1.jpg", cv2.IMREAD_GRAYSCALE)
     # softmax = softmax[0:200, 0:200]
     softmax = softmax / 255.0
     prob = np.zeros([row, col, 2])
@@ -55,7 +55,7 @@ for i in range(10):  # Number of image is 25
 
     # This potential penalizes small pieces of segmentation that are
     # spatially isolated -- enforces more spatially consistent segmentations
-    feats = create_pairwise_gaussian(sdims=(3, 3), shape=image.shape[:2])
+    feats = create_pairwise_gaussian(sdims=(5, 5), shape=image.shape[:2])
 
     d.addPairwiseEnergy(feats, compat=2,
                         kernel=dcrf.DIAG_KERNEL,
@@ -73,8 +73,9 @@ for i in range(10):  # Number of image is 25
     d.addPairwiseEnergy(feats, compat=7,
                         kernel=dcrf.DIAG_KERNEL,
                         normalization=dcrf.NORMALIZE_SYMMETRIC)
-    for j in range(4):
-        Q = d.inference(3 * j)
+    for j in range(6):
+        Q = d.inference(6 * j)
+        # print(np.shape(Q))
 
         res = np.argmax(Q, axis=0).reshape((image.shape[0], image.shape[1]))
 
@@ -82,3 +83,12 @@ for i in range(10):  # Number of image is 25
         cv2.waitKey(0)
         cv2.imshow("tmp_win2", (1 - res) * 255.0)
         cv2.waitKey(0)
+        '''
+        cmap = plt.get_cmap('bwr')
+
+        f, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
+        ax1.imshow(res, vmax=1.5, vmin=-0.4, cmap=cmap)
+        ax1.set_title('Segmentation with CRF post-processing')
+        ax2.imshow(image)
+        plt.show()
+        '''

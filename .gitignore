@@ -114,3 +114,7 @@ models/
 GitHub Desktop.lnk
 *.pkl
 models/.DS_Store
+report/CVDL/report.synctex.gz
+report/CVDL/report.fls
+report/CVDL/report.fdb_latexmk
+report/CVDL/report.aux

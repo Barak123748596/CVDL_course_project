@@ -6,7 +6,7 @@ train_output_path = 'raw_data/train/output/'
 train_input_save = 'final_data/train/input/'
 train_output_save = 'final_data/train/output/'
 
-test_input_path = 'raw_data/test/input/'
+test_input_path = 'raw_data/test/'
 test_input_save = 'final_data/test/input/'
 
 image_rows = 5120
@@ -29,7 +29,7 @@ TEST_CITY_NAME = ["bellingham", "bloomington", "innsbruck", "sfo", "tyrol-e"]
 EACH_CLASS_NUM = 36
 
 # TOTAL_RATIO = 0
-
+'''
 for i in range(CITY_NUM):
     for j in range(EACH_CLASS_NUM):
         tmp_id = i * EACH_CLASS_NUM + j
@@ -71,7 +71,7 @@ for i in range(CITY_NUM):
             cv2.imwrite(save_path, tmp_img)
             save_path = train_output_save + str(tmp_id) + "_" + str(n) + ".jpg"
             cv2.imwrite(save_path, tmp_ans)
-
+'''
 
 for i in range(CITY_NUM):
     for j in range(EACH_CLASS_NUM):
