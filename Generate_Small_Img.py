@@ -6,11 +6,11 @@ train_output_path = 'raw_data/train/output/'
 train_input_save = 'final_data/train/input/'
 train_output_save = 'final_data/train/output/'
 
-test_input_path = 'raw_data/test/'
-test_input_save = 'final_data/test/input/'
+test_input_path = 'raw_data/beijing/'
+test_input_save = 'final_data/test/beijing/'
 
-image_rows = 5120
-image_cols = 5120
+image_rows = 1560
+image_cols = 1536
 
 x_stride = 160
 y_stride = 160
@@ -73,32 +73,30 @@ for i in range(CITY_NUM):
             cv2.imwrite(save_path, tmp_ans)
 '''
 
-for i in range(CITY_NUM):
-    for j in range(EACH_CLASS_NUM):
-        tmp_id = i * EACH_CLASS_NUM + j
-        print(tmp_id + 1, "big image...")
-        img_path = test_input_path + TEST_CITY_NAME[i] + str(j + 1) + ".tif"
-        
-        img_array_init = cv2.imread(img_path, cv2.IMREAD_COLOR)  # no answer...
-        img_array = np.zeros([image_rows, image_cols, 3])
-        img_array[60:5060, 60:5060, :] = img_array_init
-        
-        batch_small_img = np.zeros([x_slice_num * y_slice_num, x_seg, y_seg, 3])
-        m = 0
-        
-        for k in range(y_slice_num):
-            for l in range(x_slice_num):
-                y_start = k * y_stride
-                y_end = y_start + y_seg
-                x_start = l * x_stride
-                x_end = x_start + x_seg
-                # print(x_start, x_end)
-                batch_small_img[m, :, :, :] = img_array[y_start:y_end, x_start:x_end, :]
-                m += 1
-    
-        for n in range(m):
-            print("saving", n, "small img...")
-            tmp_img = batch_small_img[n]
-            save_path = test_input_save + str(tmp_id) + "_" + str(n) + ".jpg"
-            cv2.imwrite(save_path, tmp_img)
+
+
+
+img_path = test_input_path + str(6) + ".tif"
+
+img_array_init = cv2.imread(img_path, cv2.IMREAD_COLOR)  # no answer...
+# img_array = np.zeros([image_rows, image_cols, 3])
+# img_array[60:5060, 60:5060, :] = img_array_init
+
+batch_small_img = np.zeros([x_slice_num * y_slice_num, x_seg, y_seg, 3])
+m = 0
+
+for k in range(y_slice_num):
+    for l in range(x_slice_num):
+        y_start = k * y_stride
+        y_end = y_start + y_seg
+        x_start = l * x_stride
+        x_end = x_start + x_seg
+        # print(x_start, x_end)
+        batch_small_img[m, :, :, :] = img_array_init[y_start:y_end, x_start:x_end, :]
+        m += 1
+for n in range(m):
+    print("saving", n, "small img...")
+    tmp_img = batch_small_img[n]
+    save_path = test_input_save + "_" + str(n) + ".jpg"
+    cv2.imwrite(save_path, tmp_img)
 

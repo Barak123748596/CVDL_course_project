@@ -26,7 +26,7 @@ criterion = torch.nn.NLLLoss()
 
 # test
 for epoch in range(EPOCH_NUM):
-    for i, (images, labels) in enumerate(test_loader):
+    for i, (images, labels) in enumerate(beijing_loader):
         images = Variable(images)
 
         img_show = np.squeeze(images.numpy(), 0)

@@ -119,3 +119,9 @@ report/CVDL/report.fls
 report/CVDL/report.fdb_latexmk
 report/CVDL/report.aux
 *.fls
+*.jpg
+*.png
+Generate_Small_Img.py
+test.py
+*.zip
+beijing.txt
