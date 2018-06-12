@@ -121,4 +121,11 @@ report/CVDL/report.aux
 *.fls
 *.jpg
 *.png
+<<<<<<< HEAD
 *.zip
+=======
+Generate_Small_Img.py
+test.py
+*.zip
+beijing.txt
+>>>>>>> parent of ae6891d... Revert "report & readme"
