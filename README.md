@@ -13,7 +13,7 @@ A CVPR PKU course project
 
 - 任务是遥感图像的分割。
 - 目前所用模型是U-Net （[arXiv:1505.04597](https://arxiv.org/abs/1505.04597), 2015）和 Hourglass ([arXiv:1603.06937](https://arxiv.org/abs/1603.06937), 2016)。
-- 数据集地址在[这里](https://project.inria.fr/aerialimagelabeling/)，训练集和测试集分别包含了五个城市的卫星照片。
+- 数据集地址在[这里](https://files.inria.fr/aerialimagelabeling/NEW2-AerialImageDataset.zip)，训练集和测试集分别包含了五个城市的卫星照片。
 - 初始阶段只区分每个像素是否属于建筑物，属于二分类问题。
 - 希望后续能够挑战更复杂的数据集，终极目标是使深度学习技术服务于农业用地的监测。
 
