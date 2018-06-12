@@ -116,7 +116,49 @@
     
     我们在报告后面会对各个不同模型进行测试，测试条件和结果汇总在表格当中。
 
+    \section{条件随机场（CRF）}
+    条件随机场（Conditional Random Field）是一种判别式概率模型，具有无向的图模型\cite{}。实际上，对于图像分割的任务而言，CRF属于传统算法。在谷歌的DeepLab中\cite{}，CRF被用于与深度神经网络结合，作为后处理的手段。迄今为止，DeepLab在诸多图像分割数据集（VOC, Cityscapes）上都达到了相当不错的效果，展现了深度学习方法与CRF结合的潜力。
 
+    在DeepLab的论文中，神经网络的输出被作为先验概率，如果直接使用这一概率进行分割，结果是很粗糙的（特别是在两类的边缘附近），即便加入short-cut也无法完全解决细节丢失的问题。CRF则根据神经网络的输出，借助像素的位置和颜色信息，计算后验概率。在区域中间部分，先验概率远离阈值，基本不会受到CRF的影响；在两区域边缘处，CRF进行后处理的主要依据则是像素颜色，处理之后可以达到比较精细的分割结果。
+
+    参考论文\cite{}，采用全连接CRF进行图像分割，吉布斯自由能为：
+    \begin{equation}
+    E(\textbf{x}) = \sum_{i} \phi_{u}(x_{i}) + \sum_{i, j} \phi_{p} (x_{i}, x_{j}).
+    \end{equation}
+    第二项为成对的像素对应的能量，表达式为：
+    \begin{equation}
+    \phi_{p}(x_{i}, x_{j}) = \mu(x_{i}, x_{j}) k(\textbf{f}_{i}, \textbf{f}_{j}),
+    \end{equation}
+    其中，核$k(\textbf{f}_{i}, \textbf{f}_{j})$的表达式采用如下形式：
+    \begin{equation}
+    k(\textbf{f}_{i}, \textbf{f}_{j}) = w^{(1)}\exp[-\frac{\| p_{i} - p_{j}\| ^{2}}{2\theta_{\alpha}^{2}} - \frac{\| I_{i} - I_{j}\| ^{2}}{2\theta_{\beta}^{2}}] + w^{(2)} \exp[-\frac{\| p_{i} - p_{j}\| ^{2}}{2\theta_{\gamma}^{2}}].
+    \end{equation}
+
+    在CRF算法中，涉及到诸多参数。在本次实验当中，用CRF进行后处理并不是任务最主要的部分，只是作为一种尝试。因此我们采用了一个轻量级的名为pydensecrf的库（github网址），然后人为设定了相应的参数，并根据部分图片的处理情况进行了一定的调整。
+
+    \begin{figure} [!]
+    \centering
+    \includegraphics[width=14.0cm]{CRF_1.pdf}
+    \caption{借助CRF进行后处理的一些例子。不难看到，几次迭代之后，预测mask的边缘变得比较锐利，小块的false positive被消除，IoU得到了改善。}
+    \label{fig:Fig 2}
+    \end{figure}
+
+    经过尝试，我们发现，尽管人为调整CRF的参数$\theta_{\alpha}$、$\theta_{\beta}$、$\theta_{\gamma}$可以在一个小区域内达到比较好的结果，但是这一组参数用于其他区域的效果可能不尽人意（泛化性能较差）。这一现象并不难理解：首先，不同城市的建筑/非建筑色调差异很大；其次，即便是同一城市，若照片的拍摄时间、地点不同，也会存在较明显的光照差异，影响到像素点的颜色。本次实验采取的CRF算法比较简单，只考虑到一对像素点之间的能量，特征选取也很简单，仅包括位置和颜色，本身鲁棒性不够强。
+
+    对于我们的模型而言，CRF比较重大的意义在于，通过后处理，可以将小块的false positive去掉，改善分割结果。
+    \begin{figure} [!]
+    \centering
+    \includegraphics[width=14.0cm]{CRF_2.pdf}
+    \caption{CRF可以去除掉false positive，改善分割结果。}
+    \label{fig:Fig 2}
+    \end{figure}
+    然而，如果参数设置不合理，可能会出现将true positive的一部分去除的情况（例如，由于屋顶有角度，向光与背光两面的颜色差异比较大，CRF后处理之后只保留了向光的部分）。因此，在使用条件随机场进行后处理时必须谨慎。
+    \begin{figure} [!]
+    \centering
+    \includegraphics[width=10.0cm]{CRF_3.pdf}
+    \caption{如果参数设置不合理，可能导致后处理之后效果反而变差，几种典型的情况如图。}
+    \label{fig:Fig 3}
+    \end{figure}
 
     
     \bibliography{reference}

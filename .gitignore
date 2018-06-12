@@ -129,3 +129,6 @@ test.py
 *.zip
 beijing.txt
 >>>>>>> parent of ae6891d... Revert "report & readme"
+Generate_Small_Img.py
+beijing.txt
+test.py
