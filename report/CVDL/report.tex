@@ -52,21 +52,40 @@
     \section{图片预处理}
     我们使用的数据集的特点如下：
     \begin{itemize}
-        \item 包含覆盖了$810km^2$（其中$405km^2$用于训练集，$405km^2$用作测试集）。
-        \item 是空间分辨率为0.3m的正交矫正彩色图像。
+        \item 包含覆盖了$810$ km$^2$（其中$405$ km$^2$用于训练集，$405$ km$^2$用作测试集）。
+        \item 是空间分辨率为$0.3$ m的正交矫正彩色图像。
         \item 标签是二分类分割：是房子和不是房子。
         \item 这些图像涵盖了不同的城市住区，从人口稠密地区(例如旧金山金融街)到高山城镇(例如奥地利蒂罗尔的利恩茨)。
     \end{itemize}
+    \begin{figure} [!]
+    \centering
+    \includegraphics[width=12.0cm]{Austin.pdf}
+    \caption{训练集中的一张原始图片。这张图是奥斯丁的照片。}
+    \label{fig:Fig 1}
+    \end{figure}
     我们先将原先大小为$5000\times5000$的图片补成$5120\times5120$（$padding=60$）的大小。然后将按照步长160（$stride=160$）其顺序切成961张$320\times320$的小图。\\
     我们随后对图片做的数据增强如下：
     \begin{itemize}
         \item 将图片旋转一个随机的角度
-        \item 将图片随机水平和数值翻转
-        \item 将图片加入高斯噪声
+        \item 将图片随机水平/竖直翻转
+        \item 加入高斯噪声
         \item 随机调整图片的亮度、对比度、饱和度和色调
     \end{itemize}
     同时也对标签做相同的旋转和翻转的变换。\\
-    我们这样做的原因是主要考虑到对于美国城市而言，房子的方向大多是极其统一的，而卫星的拍照方向固定，将造成训练集中大量的房屋方向相同，这样将使得网络的训练数据过于局限。在此考虑下，我们决定引入图片的旋转和翻转，这样可以引入训练集的随机性，用于增强网络的范性。同时，由于不同城市不同国家的房屋整体色调也有所不同，于是我们希望淡化网络对特定颜色的认知，而主要提取形状特征，这样调整图片的色调就是必要的。同时为了增强网络的鲁棒性，我们也对输入训练数据加入了高斯噪声。
+    \begin{figure} [!]
+    \centering
+    \includegraphics[width=10.0cm]{DataAug.pdf}
+    \caption{数据增强的一些例子。旋转会导致图片中黑色边缘的产生。}
+    \label{fig:Fig 1}
+    \end{figure}
+    我们之所以这样进行数据增强，是基于如下几点考虑：
+    （1）对于美国城市而言，房子的方向大多是比较统一的，而同一张卫星照片的拍照方向是确定的，将造成训练集中大量的房屋方向相同，这样将使训练数据过于局限。因此，我们决定引入图片的旋转和翻转，这样可以加入随机性，从而增强网络的泛化性能。
+    
+    （2）由于不同城市的房屋整体色调有所不同，我们希望淡化网络对特定颜色的认知，而主要提取形状特征，这样调整图片的色调就是必要的。
+    
+    （3）卫星拍照时，所使用的设备不同，可能会导致拍摄图片的信噪比不同。一般而言，拍摄照片时引入的噪声可以用高斯噪声来建模。为了增强网络的鲁棒性，我们还对输入训练数据加入了高斯噪声，噪声的均方差调整为$sigma=0.04$。
+    
+    与之相对地，我们没有改变图像的尺度。原因在于，在所使用的数据集中，测试集和训练集的图片分辨率均为$0.3$ m，如果在这个数据集上评估，就并不需要改变图像的尺度。然而，这就对我们模型的应用产生了一定的限制——如果用于测试的图片分辨率相差比较大，很可能性能会变差。这一点在之后对北京等城市的评估中有所体现。
 
 
 
@@ -158,6 +177,122 @@
     \includegraphics[width=10.0cm]{CRF_3.pdf}
     \caption{如果参数设置不合理，可能导致后处理之后效果反而变差，几种典型的情况如图。}
     \label{fig:Fig 3}
+    \end{figure}
+
+
+
+    
+    \section{模型评估}
+    对于INRIA的数据集，训练集和测试集分别包含180张大图。测试集的标签是无法拿到的，如果想知道准确率，唯一的手段是将预测的mask打包上传，由INRIA的工作人员进行评价。然而，我们试图将结果提交到网站上时，遇到了难以解决的技术问题，向工作人员发送邮件也没有得到回复。因此，我们最终评价模型时，只能通过验证集IoU和典型例子来进行评价。
+    \subsection{评估方式}
+    在进行Inference时，仍然将测试集的所有图片（大小$5000\times5000$）补为$5120\times5120$，并划分为$320\times320$，stride为$160$。将每个$320\times320$的图片进行inference，计算概率，并在整张大图上进行平均，以概率阈值$0.5$进行二分类，最后再取中央的$5000\times5000$，从而得到完整的mask。
+    
+    原始数据的训练集包含来自5个城市的180张图片。在每个城市的36张图片中，我们将前31张用于训练，后5张用于验证。我们计算了各个模型在验证集上的准确度和IoU，进行比较。
+    \subsection{模型汇总}
+    我们训练了许多模型，在报告中只针对比较有代表性的4个进行评估。各个版本模型的异同汇总在下列表格当中。
+    \begin{table}[!]
+    \caption{Typical Parameter Values.}
+    \label{tab:parameters}
+    \centering
+    \begin{tabular}{ccc}
+	\hline
+	\hline
+	Version & Loss & Net \\
+	\hline
+	1.0 & Cross Entropy & U-Net \\
+	1.1 & Weighted Cross Entropy & U-Net \\
+	1.2 & Weighted Cross Entropy & 2$\times$U-Net \\
+	1.3 & Weighted Cross Entropy + DICE & U-Net \\
+	\hline
+	\hline
+    \end{tabular}
+    \end{table}
+    这四个模型在验证集上的准确率（Acc）和IoU分别如下表所示：
+    \begin{table}[!]
+    \caption{Typical Parameter Values.}
+    \label{tab:parameters}
+    \centering
+    \begin{tabular}{ccc}
+	\hline
+	\hline
+	Version & Val Acc/$\%$ & Val IoU \\
+	\hline
+	1.0 & &  \\
+	1.1 & &  \\
+	1.2 & &  \\
+	1.3 & &  \\
+	\hline
+	\hline
+    \end{tabular}
+    \end{table}
+    \subsection{评估~\& 测试例子}
+    在测试集图片上对4个模型分别进行简单测试。由于我们无法获得测试集的标签，只能根据少数测试样例的分割情况进行简单判断，再结合经验进行分析。
+    
+    （1）V1.0：由于简单使用没有加权的交叉熵作为Loss函数，在正负样本严重不均的情况下，会出现相当多的false negative，对于密集的建筑物几乎无法识别。
+    \begin{figure} [!]
+    \centering
+    \includegraphics[width=10.0cm]{V0.png}
+    \caption{模型V1.0无法完成分割任务，这是由于训练集中正负样本不均。}
+    \label{fig:Fig 3}
+    \end{figure}
+    
+    （2）V1.1：为了解决正负样本不均的问题，采用加权的交叉熵，系数$\alpha_{1}=0.2$。训练集不变。
+    \begin{figure} [!]
+    \centering
+    \includegraphics[width=10.0cm]{V1.png}
+    \caption{模型V1.1可以初步完成分割任务，但效果还比较差。}
+    \label{fig:Fig 3}
+    \end{figure}
+    虽然已经具备一定的效果，但遗漏情况仍然存在，并且存在把人行道误判为建筑的情况。
+    
+    （3）V1.2：尝试将两个U-Net简单堆叠，希望取得更好的效果。
+    \begin{figure} [!]
+    \centering
+    \includegraphics[width=10.0cm]{V2.png}
+    \caption{测试时发现，模型V1.2的总体表现不如V1.1，这是因为深度网络容易过拟合。}
+    \label{fig:Fig 3}
+    \end{figure}
+
+    训练过程中，训练集的Loss下降很明显，但验证集的Loss波动十分剧烈，并且很快就开始上升，说明网络过拟合。由于无法进一步充实数据集，我们决定回归到单个U-Net。
+    
+    （4）V1.3：使用单个U-Net，改变Loss——除加权交叉熵外，引入DICE系数，直接目的是提升IoU。
+    \begin{figure} [!]
+    \centering
+    \includegraphics[width=5.0cm]{V3.png}
+    \caption{模型V1.3的分割效果比较令人满意，但仍然存在少许误判。}
+    \label{fig:Fig 3}
+    \end{figure}
+    
+    虽然仍然存在少许误判，但绝大部分房屋都没有遗漏，从效果上看，边缘处的分割也做的不错。在之后的部分，我们将重点观察分析模型V1.3的优缺点，并提出一些可能的改进方向。
+    
+
+
+
+    \section{在中国的应用效果}
+    不忘初心，继续前进。之前所做的工作和训练的模型，都是为了实现我们进行中国地区的土地利用情况而服务的。为了测试其效果，我们从谷歌地图上\cite{}截取了北京城市地区和农村地区、上海城市地区和江苏农村地区的部分遥感卫星地图放进网络进行试验，效果如下：
+    \begin{figure}
+        \centering
+        \subfigure[原图]{
+        \label{figa} %% label for first subfigure
+        \includegraphics[scale=.4]{BJ_construct.png}}
+        \hspace{1in}
+        \subfigure[小框]{
+        \label{figa} %% label for first subfigure
+        \includegraphics[scale=.4]{BJ_rural_house.png}}
+        \hspace{1in}
+        \subfigure[中框]{
+        \label{fig:subfig:b} %% label for second subfigure
+        \includegraphics[scale=.4]{BJ_rural_field.png}}
+        \hspace{1in}
+        \subfigure[大框]{
+        \label{figb} %% label for first subfigure
+        \includegraphics[scale=.4]{SH_downtown.png}}
+        \hspace{1in}
+        \subfigure[大框]{
+        \label{figb} %% label for first subfigure
+        \includegraphics[scale=.4]{JS_rural.png}}
+        \caption{我们发现，当框图最小时，切出来的grabcut结果最符合直觉上的美感，当框图扩大时，切割结果  就会或多或少出现问题，这是因为当我们从很小开始时，范围不断扩大这个过程的鲁棒性比从大框往里面缩的  效果要好，因此我认为，这种情况小比大更合适}
+        \label{figb} %% label for entire figure
     \end{figure}
 
     
