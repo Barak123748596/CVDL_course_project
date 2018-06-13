@@ -2,6 +2,8 @@
 \usepackage{CJKutf8}
 \usepackage{indentfirst}
 \usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subfigure}
 \usepackage{amsmath}
 \usepackage{longtable}
 \usepackage{fancyhdr}
@@ -103,7 +105,7 @@
     最初使用一个U-Net进行测试的效果并不是很理想，于是我们尝试将两个U-Net拼接在一起，希望通过增加模型的深度，取得更好的效果。然而在训练时，拼接的模型很快就出现了过拟合现象，在验证集上的loss无法很好地收敛，泛化性能很差，因此最终我们没有采用这一模型。
     
     \subsection{Loss函数}
-    如果简单地把分割任务看作一个二分类，在网络的最后一层使用Softmax激励函数，得到每个像素分属于两类（建筑/非建筑）的概率，那么可以直接用交叉熵作为Loss函数。从代码train.py中可以看到，pyTorch中对于分割问题的Loss，使用的是Nllloss()函数，此时网络最后一层是logsoftmax，但本质是相同的。
+    如果简单地把分割任务看作一个二分类，在网络的最后一层使用Softmax激励函数，得到每个像素分属于两类（建筑/非建筑）的概率，那么可以直接用交叉熵作为Loss函数。从代码train.py中可以看到， pyTorch 中对于分割问题的 Loss，使用的是Nllloss()函数，此时网络最后一层是logsoftmax，但本质是相同的。
     
     对于二分类问题，交叉熵的表达式可以写作：
     \begin{equation}
@@ -266,34 +268,105 @@
     虽然仍然存在少许误判，但绝大部分房屋都没有遗漏，从效果上看，边缘处的分割也做的不错。在之后的部分，我们将重点观察分析模型V1.3的优缺点，并提出一些可能的改进方向。
     
 
+    \section{V1.3模型分析}
+    在10个城市分别测试，发现模型V1.3对于比较密集的建筑效果很好，但在山区、树林等区域仍然会出现false positive。我们从测试图片中选取了10张（每个城市各一张），截取了建筑物比较密集的部分，汇总在图中。
+     \begin{figure} [!]
+    \centering
+    \includegraphics[width=10.0cm]{10_city.pdf}
+    \caption{在建筑密集区域，模型V1.3的分割效果比较令人满意。}
+    \label{fig:Fig 3}
+    \end{figure}
+    
+    然而，V1.3仍然存在着一些问题。
+    \subsection{船只}
+    首先，在港口附近有大量船只。粗略看去，船只与建筑物的外观极其相似。之所以人类能区分船和建筑，不仅借助了海面的信息，还引入了“建筑物应当接近四方形”的先验信息。这些信息对于神经网络而言，都不是已知的，是需要学习的（从效果来看，似乎比较难学到）。虽然船只对应的像素所占比例相对较小，对于准确率等指标不会有太大影响，但这一问题比较难解决。一个可能的解决办法是额外训练一个网络，用于区分内陆、海岸和海洋，将地形信息结合在分割任务当中。
+    \subsection{水面、森林}
+    由于不同城市的地表情况完全不同，在测试集中很可能出现训练集中没有出现的地面。具体来说，森林种类不同、农田植被不同、水体深浅不同，产生的纹理千变万化。经过测试，用V1.3进行分割，仍然会出现一些false positive。观察表明，用U-Net进行分割的泛化能力并不像想象中那样强——在训练数据中没有包含的纹理会导致较多的false positive。目前我们认为，如果能够扩充数据集，并进行足够的数据增强，必然会使性能得到提升。
+    \subsection{遮挡}
+    很多比较低矮的房子会被大型树木遮挡，遮挡得比较严密的部分对神经网络而言就很难进行判断。人类在进行判断时，实际上会不自觉地加入“房子接近四方形”的先验信息，将被树木遮挡的部分“脑补”出来。神经网络实际上很难学习到这样的信息（层次相当高的信息），因此倾向于仅借助图片中低层次的信息来进行分割。诚然，这一问题可能与网络的设计有关——如果采用稍大的卷积核或增加网络深度，或许可以增大感受野，使网络中靠后的神经元能够学到较高层次的信息。
+    
+
 
 
     \section{在中国的应用效果}
-    不忘初心，继续前进。之前所做的工作和训练的模型，都是为了实现我们进行中国地区的土地利用情况而服务的。为了测试其效果，我们从谷歌地图上\cite{}截取了北京城市地区和农村地区、上海城市地区和江苏农村地区的部分遥感卫星地图放进网络进行试验，效果如下：
+    \subsection{遥感卫星照片估计情况}
+    之前所做的工作和训练的模型，都是为了实现我们进行中国地区的土地利用情况而服务的。为了测试其效果，我们从谷歌地图上\cite{}截取了北京城市地区和农村地区、上海城市地区和江苏农村地区的部分遥感卫星地图放进网络进行试验，效果如下：
     \begin{figure}
         \centering
-        \subfigure[原图]{
-        \label{figa} %% label for first subfigure
+        \subfigure [北京城市建筑识别情况]{
+        \label{BJ_construct} %% label for first subfigure
         \includegraphics[scale=.4]{BJ_construct.png}}
         \hspace{1in}
-        \subfigure[小框]{
-        \label{figa} %% label for first subfigure
+        \subfigure [北京农村建筑识别情况]{
+        \label{BJ_rural_house} %% label for first subfigure
         \includegraphics[scale=.4]{BJ_rural_house.png}}
         \hspace{1in}
-        \subfigure[中框]{
-        \label{fig:subfig:b} %% label for second subfigure
+        \subfigure[北京农村田地识别情况]{
+        \label{BJ_rural_field} %% label for second subfigure
         \includegraphics[scale=.4]{BJ_rural_field.png}}
         \hspace{1in}
-        \subfigure[大框]{
-        \label{figb} %% label for first subfigure
+        \subfigure[上海城市建筑识别情况]{
+        \label{SH_downtown} %% label for first subfigure
         \includegraphics[scale=.4]{SH_downtown.png}}
         \hspace{1in}
-        \subfigure[大框]{
-        \label{figb} %% label for first subfigure
+        \subfigure[江苏农村田地识别情况]{
+        \label{JS_rural} %% label for first subfigure
         \includegraphics[scale=.4]{JS_rural.png}}
-        \caption{我们发现，当框图最小时，切出来的grabcut结果最符合直觉上的美感，当框图扩大时，切割结果  就会或多或少出现问题，这是因为当我们从很小开始时，范围不断扩大这个过程的鲁棒性比从大框往里面缩的  效果要好，因此我认为，这种情况小比大更合适}
-        \label{figb} %% label for entire figure
-    \end{figure}
+        \caption{以上图片分别是各个地区遥感照片的估计情况的样例}
+        \label{pics} %% label for entire figure
+    \end{figure}\\
+    其中\ref{BJ_construct}, \ref{BJ_rural_house}, \ref{BJ_rural_field}, \ref{SH_downtown}四幅图片的测试情况说明我们的模型在换数据集时（从美国换到中国），其具有一定的泛化性能，对于建筑的预测比较准确。特别是图片\ref{BJ_construct}，其中部位置是一个正在建设的房子工地，网络也能较为准确地对其进行估计。这对我们是有极大的实际意义的，因为政府不用等到房子建好以后才报警去拆除，而是在一开始就能发现趋势，对违法的村民进行劝止，可以防止提高工作难度造成更大损失。但是我们任然需要注意到，在\ref{JS_rural}中，即使照片中没有任何建筑，经过网络的分析却做出了很多建筑的预测。虽然这些预测可以通过上述的CRF算法来修正掉，但是网络本身的预测证明，对于不均匀的块状农田而言，网络想要将其识别为“无建筑”是非常困难的。这可能是由于在训练网络的训练集中极度缺少农田，而所有出现植物的情况都树或者均匀的绿化用地所致。
+
+    \subsection{后续处理}
+    接下来我们设计算法将已经完成图像分割和CRF处理的图片框出，去掉过小的框（因为那大概率是田地或者树阴影经CRF处理的遗留）并记录每个框的中心作为这个建筑的位置，于是我们得到一个位置数组。我们将其与政府给出的要求进行比对，将不符合规定的地点输出作为潜在违规的警告。\\
+    画框的算法如下：先从矩阵的第一行扫起，把连续为建筑的地方的看做一个矩形块，并用一个列表记录。每个元素记录一个矩阵的左上角和右下角坐标。然后再扫第二行，也得到一些矩形块，要是和已有的在列上存在重合部分就将其合并为一个，这样不断重复剩余行，并不断更新列表即可得到一个包含了所有矩形框的列表。
+
+    
+
+
+    \section{反思与展望}
+    
+    
+    \section{小组分工}
+    本次大作业的内容是遥感图像的分割，主要的分工如下。
+    
+    葛博文同学负责的部分包括：
+    
+    （1）最初提出问题；
+    
+    （2）对数据集进行预处理，包括padding和切割；
+    
+    （3）提出使用加权交叉熵解决正负样本不均的问题；
+    
+    （4）实现U-Net框架；
+    
+    （5）下载中国部分城地区的卫星照片，调整分辨率；
+    
+    （6）对中国部分地区照片进行切割，测试模型；
+    
+    （7）设计算法，绘制bounding box；
+    
+    （8）撰写报告、制作幻灯片。
+    
+    周清逸同学负责的部分包括：
+    
+    （1）确定合理的数据增强方式；
+    
+    （2）实现U-Net框架；
+    
+    （3）实现pile U-Net；
+    
+    （4）尝试在Loss函数中加入DICE系数相关的项；
+    
+    （5）测试使用CRF进行后处理；
+    
+    （6）准确率测试；
+    
+    （7）撰写报告、制作幻灯片。
+
+
+
+
 
     
     \bibliography{reference}
